@@ -11,5 +11,3 @@ d = dataset.iloc[:, 4:].values
 mlp = MLP(X,d, [15, 3])
 
 mlp.train()
-
-print(mlp.test([0.8622,0.7101,0.6236,0.7894]));

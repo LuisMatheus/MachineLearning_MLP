@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-import math
+import numpy as np
 
 class ActivationFunction(ABC):
 
@@ -18,9 +18,9 @@ class DerivativeFunction(ABC):
 class sigmoid(ActivationFunction):
     
     def g(self,u):
-        return 1/(1+math.exp(-u))
+        return 1/(1+np.exp(-u))
     
 class sigmoidDerivative(DerivativeFunction):
     
     def dg(self,u):
-        return (1/(1+math.exp(-u))) * (1- (1/(1+math.exp(-u))) )
+        return (1/(1+np.exp(-u))) * (1- (1/(1+np.exp(-u))) )

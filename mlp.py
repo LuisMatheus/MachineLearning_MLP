@@ -3,7 +3,7 @@ from activation_functions import sigmoid, sigmoidDerivative
 
 class MLP:
     
-    def __init__(self, input_values, output_values, layers, activation_function=sigmoid(), derivative_function=sigmoidDerivative(), learning_rate=0.1, precision=1e-6):
+    def __init__(self, input_values, output_values, layers, activation_function=sigmoid(), derivative_function=sigmoidDerivative(), learning_rate=0.1, precision=0.000001):
        ones_column = np.ones((len(input_values), 1)) * -1
        self.input_values = np.append(ones_column, input_values, axis=1)
        self.output_values = output_values
@@ -22,6 +22,8 @@ class MLP:
        self.eqms = []
        
     def train(self):
+        
+        #print(f'Old W: {self.W}')
         
         print('Initializing the train process....')
         error = True
@@ -47,8 +49,8 @@ class MLP:
                     
                 #delta2
                 delta2 = np.zeros(I2.shape)
-                for i in range(Y2.shape[0]):
-                    delta2[i] = d[i]-Y2[i] * self.derivative_function.dg(I2[i])
+                for i in range(I2.shape[0]):
+                    delta2[i] = (d[i]-Y2[i]) * self.derivative_function.dg(I2[i])
                 
                 #ajustar W2
                 self.W[1] = self.W[1] + self.learning_rate * np.dot(np.transpose(np.array([delta2])),np.array([Y1]))
@@ -59,7 +61,8 @@ class MLP:
                 #remover o bias
                 delta1 = delta1[1:,:]
                 
-                for i in range(delta1.shape[0]):
+                #delta1
+                for i in range(I1.shape[0]):
                     delta1[i] = delta1[i] * self.derivative_function.dg(I1[i]) 
                 
                 #ajustar W1
@@ -71,10 +74,13 @@ class MLP:
                 
             #print(f'New W: {self.W}')
             eqm_actual = self.eqm()
+            self.eqms.append(eqm_actual)
             
             if abs(eqm_actual - eqm_previous) < self.precision:
                 error = False
-                
+                #self.W[0] = self.W[0][ : ,1: ]
+                #self.W[1] = self.W[1][ : ,1: ]
+                print
         #print(f'Final W: {self.W}')
          
         
@@ -102,7 +108,6 @@ class MLP:
     def test(self,x):
         
         
-        #x = np.transpose(np.array([x]))
         x = np.append(-1, x)
         
         I1 = np.dot(self.W[0], x)
@@ -116,5 +121,12 @@ class MLP:
         for i in range(Y2.shape[0]):
             Y2[i] = self.activation_function.g(I2[i])
             
-        return Y2
+        res = []
+        #arrendondamento
+        for i in range(Y2.shape[0]):
+            if Y2[i] >= 0.5:
+                res.append(1)
+            else:
+                res.append(0)
+        return res
         
